@@ -15,8 +15,8 @@ const getGitPushNumber = () => {
 
 const generateBlogContent = async () => {
   const gitPushNumber = getGitPushNumber();
-  const changesSummary = 'Summary of changes'; // Implement logic to get changes summary
-  const codeChanges = 'Code changes'; // Implement logic to get code changes
+  const changesSummary = 'Summary of changes'; 
+  const codeChanges = 'Code changes';
 
   return `
     # Git Push Number: ${gitPushNumber}
@@ -32,30 +32,40 @@ const generateBlogContent = async () => {
 };
 
 const publishBlogPost = async (content) => {
-  const hashnodeApiKey = process.env.HASHNODE_API_KEY;
-  const apiUrl = 'https://api.hashnode.com';
-
-  try {
-    const response = await axios.post(
-      `${apiUrl}/v1/blog/YOUR_HASHNODE_BLOG_ID/stories`, // Replace with your actual Hashnode blog ID
-      {
-        title: `Blog Post - Git Push #${getGitPushNumber()}`,
-        content,
-        publishDate: new Date().toISOString(),
-        isRepublished: false,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${hashnodeApiKey}`,
+    const hashnodeApiKey = process.env.HASHNODE_API_KEY;
+    const hashnodeBlogId = process.env.HASHNODE_BLOG_ID;
+  
+    const apiUrl = 'https://api.hashnode.com';
+  
+    try {
+      const response = await axios.post(
+        `${apiUrl}/v1/blog/${hashnodeBlogId}/stories`,
+        {
+          title: `Blog Post - Git Push #${getGitPushNumber()}`,
+          content,
+          publishDate: new Date().toISOString(),
+          isRepublished: false,
         },
+        {
+          headers: {
+            Authorization: `Bearer ${hashnodeApiKey}`,
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        console.log('Blog post published successfully:', response.data.url);
+      } else {
+        console.error('Error publishing blog post. Unexpected status code:', response.status);
       }
-    );
-
-    console.log('Blog post published successfully:', response.data.url);
-  } catch (error) {
-    console.error('Error publishing blog post:', error.message);
-  }
-};
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        console.error('Error publishing blog post. API endpoint not found (404).');
+      } else {
+        console.error('Error publishing blog post:', error.message);
+      }
+    }
+  };
 
 const main = async () => {
   const blogContent = await generateBlogContent();
