@@ -15,8 +15,8 @@ const getGitPushNumber = () => {
 
 const generateBlogContent = async () => {
   const gitPushNumber = getGitPushNumber();
-  const changesSummary = 'Summary of changes'; 
-  const codeChanges = 'Code changes';
+  const changesSummary = 'Summary of changes'; // Implement logic to get changes summary
+  const codeChanges = 'Code changes'; // Implement logic to get code changes
 
   return `
     # Git Push Number: ${gitPushNumber}
@@ -31,46 +31,66 @@ const generateBlogContent = async () => {
   `;
 };
 
-const publishBlogPost = async (content) => {
-    const hashnodeApiKey = process.env.HASHNODE_API_KEY;
-    const hashnodeBlogId = process.env.HASHNODE_BLOG_ID;
-  
-    const apiUrl = 'https://api.hashnode.com';
-  
-    try {
-      const response = await axios.post(
-        `${apiUrl}/v1/blog/${hashnodeBlogId}/stories`,
-        {
-          title: `Blog Post - Git Push #${getGitPushNumber()}`,
-          content,
-          publishDate: new Date().toISOString(),
-          isRepublished: false,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${hashnodeApiKey}`,
-          },
+const publishBlogPost = async () => {
+  const hashnodeApiKey = process.env.HASHNODE_API_KEY;
+  const hashnodeBlogId = process.env.HASHNODE_BLOG_ID;
+  const apiUrl = 'https://gql.hashnode.com';
+
+  const query = `
+    mutation PublishPost($input: PublishPostInput!) {
+      publishPost(input: $input) {
+        post {
+          _id
+          title
+          slug
+          publishedAt
+          // Add other fields you want to retrieve
         }
-      );
-  
-      if (response.status === 200) {
-        console.log('Blog post published successfully:', response.data.url);
-      } else {
-        console.error('Error publishing blog post. Unexpected status code:', response.status);
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        console.error('Error publishing blog post. API endpoint not found (404).');
-      } else {
-        console.error('Error publishing blog post:', error.message);
       }
     }
+  `;
+
+  const variables = {
+    input: {
+      title: 'Your Blog Post Title',
+      subtitle: 'Your Blog Post Subtitle',
+      publicationId: hashnodeBlogId,
+      contentMarkdown: await generateBlogContent(),
+      publishedAt: new Date().toISOString(),
+      // Add other required fields as needed
+    },
   };
 
+  try {
+    const response = await axios.post(
+      apiUrl,
+      {
+        query,
+        variables,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${hashnodeApiKey}`,
+        },
+      }
+    );
+
+    if (response.data.errors) {
+      console.error('Error publishing blog post:', response.data.errors);
+    } else {
+      const publishedPost = response.data.data.publishPost.post;
+      console.log('Blog post published successfully:', publishedPost.title);
+    }
+  } catch (error) {
+    console.error('Error publishing blog post:', error.message);
+  }
+};
+
 const main = async () => {
-  const blogContent = await generateBlogContent();
-  await publishBlogPost(blogContent);
+  await publishBlogPost();
 };
 
 main();
+
 
