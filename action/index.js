@@ -62,3 +62,5 @@ const main = async () => {
   await publishBlogPost(blogContent);
 };
 
+main();
+
