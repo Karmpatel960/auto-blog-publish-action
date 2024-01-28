@@ -1,4 +1,4 @@
-const { main } = require('./action/publish');
+const { main } = require('./action/index');
 
 
 main();
