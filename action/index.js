@@ -44,7 +44,6 @@ const publishBlogPost = async () => {
           title
           slug
           publishedAt
-          // Add other fields you want to retrieve
         }
       }
     }
@@ -71,7 +70,7 @@ const publishBlogPost = async () => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${hashnodeApiKey}`,
+          'Authorization': `${hashnodeApiKey}`,
         },
       }
     );
