@@ -1,13 +1,13 @@
-import { existsSync, readFileSync } from 'fs';
-import { join } from 'path';
-import { post } from 'axios';
+const fs = require('fs');
+const path = require('path');
+const axios = require('axios');
 
-const postsDir = join(__dirname, '..', 'posts');
+const postsDir = path.join(__dirname, '..', 'posts');
 
 const getGitPushNumber = () => {
   const pushEventPath = process.env.GITHUB_EVENT_PATH;
-  if (existsSync(pushEventPath)) {
-    const pushEvent = JSON.parse(readFileSync(pushEventPath, 'utf8'));
+  if (fs.existsSync(pushEventPath)) {
+    const pushEvent = JSON.parse(fs.readFileSync(pushEventPath, 'utf8'));
     return pushEvent && pushEvent.number;
   }
   return null;
@@ -36,7 +36,7 @@ const publishBlogPost = async (content) => {
   const apiUrl = 'https://api.hashnode.com';
 
   try {
-    const response = await post(
+    const response = await axios.post(
       `${apiUrl}/v1/blog/YOUR_HASHNODE_BLOG_ID/stories`, // Replace with your actual Hashnode blog ID
       {
         title: `Blog Post - Git Push #${getGitPushNumber()}`,
