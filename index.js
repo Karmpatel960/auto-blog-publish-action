@@ -1,3 +1,4 @@
-import { main } from './action/publish';
+const { main } = require('./action/publish');
+
 
 main();
