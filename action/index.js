@@ -1,8 +1,7 @@
+const axios = require("axios");
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
-
-const postsDir = path.join(__dirname, '..', 'posts');
+require('dotenv').config();
 
 const getGitPushNumber = () => {
   const pushEventPath = process.env.GITHUB_EVENT_PATH;
@@ -13,10 +12,35 @@ const getGitPushNumber = () => {
   return null;
 };
 
+const getGitProjectName = () => {
+  const repositoryPath = process.env.GITHUB_REPOSITORY;
+  const parts = repositoryPath.split('/');
+  return parts[1] || 'Unknown Project';
+};
+
+const getLatestCommitTitle = async () => {
+  const commitSha = process.env.GITHUB_SHA;
+  const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${commitSha}`;
+  
+  try {
+    const response = await axios.get(apiUrl, {
+      headers: {
+        'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+      },
+    });
+
+    return response.data.commit.message;
+  } catch (error) {
+    console.error('Error fetching latest commit:', error.message);
+    return 'N/A';
+  }
+};
+
 const generateBlogContent = async () => {
   const gitPushNumber = getGitPushNumber();
-  const changesSummary = 'Summary of changes'; // Implement logic to get changes summary
-  const codeChanges = 'Code changes'; // Implement logic to get code changes
+  const commitTitle = process.env.GITHUB_EVENT_NAME === "push" ? await getLatestCommitTitle() : 'N/A';
+  const changesSummary = 'Summary of changes';
+  const codeChanges = 'Code changes'; 
 
   return `
     # Git Push Number: ${gitPushNumber}
@@ -28,8 +52,13 @@ const generateBlogContent = async () => {
     \`\`\`
     ${codeChanges}
     \`\`\`
+
+    ## Latest Commit
+    ${commitTitle}
   `;
 };
+
+
 
 const publishBlogPost = async () => {
   const hashnodeApiKey = process.env.HASHNODE_API_KEY;
@@ -40,7 +69,7 @@ const publishBlogPost = async () => {
     mutation PublishPost($input: PublishPostInput!) {
       publishPost(input: $input) {
         post {
-          _id
+          id
           title
           slug
           publishedAt
@@ -49,14 +78,24 @@ const publishBlogPost = async () => {
     }
   `;
 
+  if (!hashnodeApiKey) {
+    console.error('Error: HASHNODE_API_KEY is missing or empty.');
+    return;
+  }
+
   const variables = {
     input: {
-      title: 'Your Blog Post Title',
-      subtitle: 'Your Blog Post Subtitle',
+      title: `Github Project ${getGitProjectName()} Summary - Issue #${getGitPushNumber()}`,
+      subtitle: 'Summary of changes and code changes for the latest push to the Github project.',
       publicationId: hashnodeBlogId,
       contentMarkdown: await generateBlogContent(),
       publishedAt: new Date().toISOString(),
-      // Add other required fields as needed
+      tags: [
+        {
+          slug: "issueblog",
+          name: "Issue Blog",
+        },
+      ],
     },
   };
 
@@ -70,18 +109,20 @@ const publishBlogPost = async () => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `${hashnodeApiKey}`,
+          'Authorization': `Bearer ${hashnodeApiKey}`,
         },
       }
     );
 
     if (response.data.errors) {
+      console.error('API Response:', response.data);
       console.error('Error publishing blog post:', response.data.errors);
     } else {
       const publishedPost = response.data.data.publishPost.post;
       console.log('Blog post published successfully:', publishedPost.title);
     }
   } catch (error) {
+    console.log('API Response:', error.response.data);
     console.error('Error publishing blog post:', error.message);
   }
 };
@@ -91,5 +132,3 @@ const main = async () => {
 };
 
 main();
-
-
