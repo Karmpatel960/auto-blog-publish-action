@@ -19,16 +19,21 @@ const getGitPushNumber = async () => {
 };
 
 const getGitProjectName = async () => {
-  let gitProjectName;
-  await exec.exec('basename', ['$(git rev-parse --show-toplevel)'], {
+  let gitProjectPath;
+  await exec.exec('git', ['rev-parse', '--show-toplevel'], {
     listeners: {
       stdout: (data) => {
-        gitProjectName = data.toString().trim();
+        gitProjectPath = data.toString().trim();
       },
     },
   });
-  return gitProjectName;
+
+  const pathParts = gitProjectPath.split('/');
+  const repoName = pathParts[pathParts.length - 1];
+
+  return repoName;
 };
+
 
 
 
