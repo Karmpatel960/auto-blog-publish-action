@@ -3,20 +3,33 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const getGitPushNumber = () => {
-  const pushEventPath = process.env.GITHUB_EVENT_PATH;
-  if (fs.existsSync(pushEventPath)) {
-    const pushEvent = JSON.parse(fs.readFileSync(pushEventPath, 'utf8'));
-    return pushEvent && pushEvent.number;
-  }
-  return null;
+const core = require('@actions/core');
+const exec = require('@actions/exec');
+
+const getGitPushNumber = async () => {
+  let gitPushNumber;
+  await exec.exec('git', ['rev-list', '--count', '--all'], {
+    listeners: {
+      stdout: (data) => {
+        gitPushNumber = data.toString().trim();
+      },
+    },
+  });
+  return gitPushNumber;
 };
 
-const getGitProjectName = () => {
-  const repositoryPath = process.env.GITHUB_REPOSITORY;
-  const parts = repositoryPath.split('/');
-  return parts[1] || 'Unknown Project';
+const getGitProjectName = async () => {
+  let gitProjectName;
+  await exec.exec('basename "$(git rev-parse --show-toplevel)"', [], {
+    listeners: {
+      stdout: (data) => {
+        gitProjectName = data.toString().trim();
+      },
+    },
+  });
+  return gitProjectName;
 };
+
 
 const getLatestCommitTitle = async () => {
   const commitSha = process.env.GITHUB_SHA;
@@ -38,7 +51,7 @@ const getLatestCommitTitle = async () => {
 
 const generateBlogContent = async () => {
   const gitPushNumber = getGitPushNumber();
-  const commitTitle = process.env.GITHUB_EVENT_NAME === "push" ? await getLatestCommitTitle() : 'N/A';
+  const commitTitle = await getLatestCommitTitle();
   const changesSummary = 'Summary of changes';
   const codeChanges = 'Code changes'; 
 
