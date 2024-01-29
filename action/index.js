@@ -20,7 +20,7 @@ const getGitPushNumber = async () => {
 
 const getGitProjectName = async () => {
   let gitProjectName;
-  await exec.exec('basename "$(git rev-parse --show-toplevel)"', [], {
+  await exec.exec('basename', ['$(git rev-parse --show-toplevel)'], {
     listeners: {
       stdout: (data) => {
         gitProjectName = data.toString().trim();
@@ -29,6 +29,7 @@ const getGitProjectName = async () => {
   });
   return gitProjectName;
 };
+
 
 
 const getLatestCommitTitle = async () => {
@@ -50,7 +51,7 @@ const getLatestCommitTitle = async () => {
 };
 
 const generateBlogContent = async () => {
-  const gitPushNumber = getGitPushNumber();
+  const gitPushNumber = await getGitPushNumber();
   const commitTitle = await getLatestCommitTitle();
   const changesSummary = 'Summary of changes';
   const codeChanges = 'Code changes'; 
@@ -98,7 +99,7 @@ const publishBlogPost = async () => {
 
   const variables = {
     input: {
-      title: `Github Project ${getGitProjectName()} Summary - Issue #${getGitPushNumber()}`,
+      title: `Github Project ${await getGitProjectName()} Summary - Issue #${await getGitPushNumber()}`,
       subtitle: 'Summary of changes and code changes for the latest push to the Github project.',
       publicationId: hashnodeBlogId,
       contentMarkdown: await generateBlogContent(),
