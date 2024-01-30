@@ -8,10 +8,12 @@ const exec = require('@actions/exec');
 
 const getGitPushNumber = async () => {
   let gitPushNumber;
-  await exec.exec('git', ['rev-list', '--count', '--all'], {
+  await exec.exec('git', ['log', '--format=%B', '-n', '1'], {
     listeners: {
       stdout: (data) => {
-        gitPushNumber = data.toString().trim();
+        const commitMessage = data.toString().trim();
+        const match = commitMessage.match(/Issue #(\d+)/i);
+        gitPushNumber = match ? match[1] : null;
       },
     },
   });
