@@ -1,3 +1,4 @@
+const fs = require("fs");
 const axios = require("axios");
 const { exec } = require('@actions/exec');
 require('dotenv').config();
@@ -14,67 +15,55 @@ const getGitPushNumber = async () => {
       },
     });
 
-    console.log('Commit Message:', commitMessage.trim()); // Add this line for debugging
+    console.log('Commit Message:', commitMessage.trim());
 
     const match = commitMessage.match(/Issue #(\d+)/i);
     gitPushNumber = match ? match[1] : null;
-    console.log('Commit/Issue Number:', gitPushNumber); // Add this line for debugging
+    console.log('Commit/Issue Number:', gitPushNumber);
   } catch (error) {
     console.error('Error getting Git push number:', error.message);
   }
   return gitPushNumber;
 };
 
-const getGitProjectName = async () => {
+const getGitCommitDetails = async () => {
   try {
-    let gitProjectPath;
-    await exec('git', ['rev-parse', '--show-toplevel'], {
-      listeners: {
-        stdout: (data) => {
-          gitProjectPath = data.toString().trim();
-        },
-      },
-    });
-
-    const pathParts = gitProjectPath.split('/');
-    const repoName = pathParts[pathParts.length - 1];
-
-    return repoName;
-  } catch (error) {
-    console.error('Error getting Git project name:', error.message);
-    return 'N/A';
-  }
-};
-
-const getLatestCommitTitle = async () => {
-  try {
-    console.log('GITHUB_TOKEN:', process.env.repo_token); // Make sure the token is available
-
     const commitSha = process.env.GITHUB_SHA;
     const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${commitSha}`;
     
     const response = await axios.get(apiUrl, {
       headers: {
-        'Authorization': `Bearer ${process.env.repo_token}`, // Use repo_token as the variable name
+        'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
       },
     });
 
-    return response.data.commit.message;
+    const commitDetails = {
+      number: response.data.sha.substring(0, 7),
+      author: response.data.commit.author.name,
+      link: response.data.html_url,
+    };
+
+    console.log('Commit Details:', commitDetails);
+
+    return commitDetails;
   } catch (error) {
-    console.error('Error fetching latest commit:', error.message);
-    return 'N/A';
+    console.error('Error fetching commit details:', error.message);
+    return null;
   }
 };
 
 const generateBlogContent = async () => {
   try {
     const gitPushNumber = await getGitPushNumber();
-    const commitTitle = await getLatestCommitTitle();
+    const commitDetails = await getGitCommitDetails();
     const changesSummary = 'Summary of changes';
     const codeChanges = 'Code changes'; 
 
     return `
       # Git Push Number: ${gitPushNumber}
+      # Commit Number: ${commitDetails.number}
+      # Author: ${commitDetails.author}
+      # Commit Link: ${commitDetails.link}
   
       ## Changes Summary
       ${changesSummary}
@@ -85,13 +74,15 @@ const generateBlogContent = async () => {
       \`\`\`
   
       ## Latest Commit
-      ${commitTitle}
+      ${commitDetails.link} - ${commitDetails.number} by ${commitDetails.author}
     `;
   } catch (error) {
     console.error('Error generating blog content:', error.message);
     return 'N/A';
   }
 };
+
+
 
 const publishBlogPost = async () => {
   const hashnodeApiKey = process.env.HASHNODE_API_KEY;

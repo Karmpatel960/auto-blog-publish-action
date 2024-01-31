@@ -26,5 +26,5 @@ jobs:
         env:
           HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
           HASHNODE_BLOG_ID: ${{ secrets.HASHNODE_BLOG_ID }}
-          repo-token: ${{ secrets.REPO_TOKEN }}
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
 #           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
