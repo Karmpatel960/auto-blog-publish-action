@@ -18,12 +18,28 @@ const getGitPushNumber = async () => {
     console.log('Commit Message:', commitMessage.trim());
 
     const match = commitMessage.match(/Issue #(\d+)/i);
-    gitPushNumber = match ? match[1] : null;
+    gitPushNumber = match ? match[1] : 1;
     console.log('Commit/Issue Number:', gitPushNumber);
   } catch (error) {
     console.error('Error getting Git push number:', error.message);
   }
   return gitPushNumber;
+};
+
+const getGitProjectName = async () => {
+  let gitProjectPath;
+  await exec.exec('git', ['rev-parse', '--show-toplevel'], {
+    listeners: {
+      stdout: (data) => {
+        gitProjectPath = data.toString().trim();
+      },
+    },
+  });
+
+  const pathParts = gitProjectPath.split('/');
+  const repoName = pathParts[pathParts.length - 1];
+
+  return repoName;
 };
 
 const getGitCommitDetails = async () => {
