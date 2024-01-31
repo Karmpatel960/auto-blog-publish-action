@@ -3,22 +3,20 @@ const { exec } = require('@actions/exec');
 require('dotenv').config();
 
 const getGitPushNumber = async () => {
-  try {
-    let gitPushNumber;
-    await exec('git', ['log', '--format=%B', '-n', '1'], {
-      listeners: {
-        stdout: (data) => {
-          const commitMessage = data.toString().trim();
-          const match = commitMessage.match(/Issue #(\d+)/i);
-          gitPushNumber = match ? match[1] : null;
-        },
+  let gitPushNumber;
+  await exec.exec('git', ['log', '--format=%B', '-n', '1'], {
+    listeners: {
+      stdout: (data) => {
+        const commitMessage = data.toString().trim();
+        console.log('Commit Message:', commitMessage); // Add this line for debugging
+
+        const commitParts = commitMessage.split(/\s+/);
+        gitPushNumber = commitParts[commitParts.length - 1];
+        console.log('Commit/Issue Number:', gitPushNumber); // Add this line for debugging
       },
-    });
-    return gitPushNumber;
-  } catch (error) {
-    console.error('Error getting Git push number:', error.message);
-    return 'N/A';
-  }
+    },
+  });
+  return gitPushNumber;
 };
 
 const getGitProjectName = async () => {
@@ -110,10 +108,11 @@ const publishBlogPost = async () => {
       console.error('Error: HASHNODE_API_KEY is missing or empty.');
       return;
     }
+    // await getGitProjectName()
 
     const variables = {
       input: {
-        title: `Github Project ${await getGitProjectName()} Summary - Issue #${await getGitPushNumber()}`,
+        title: `Github Project ${github.repository} Summary - Issue #${await getGitPushNumber()}`,
         subtitle: 'Summary of changes and code changes for the latest push to the Github project.',
         publicationId: hashnodeBlogId,
         contentMarkdown: await generateBlogContent(),
