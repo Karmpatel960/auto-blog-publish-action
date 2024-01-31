@@ -42,12 +42,14 @@ const getGitProjectName = async () => {
 
 const getLatestCommitTitle = async () => {
   try {
+    console.log('GITHUB_TOKEN:', process.env.repo_token); // Make sure the token is available
+
     const commitSha = process.env.GITHUB_SHA;
     const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${commitSha}`;
     
     const response = await axios.get(apiUrl, {
       headers: {
-        'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+        'Authorization': `Bearer ${process.env.repo_token}`, // Use repo_token as the variable name
       },
     });
 
@@ -108,11 +110,10 @@ const publishBlogPost = async () => {
       console.error('Error: HASHNODE_API_KEY is missing or empty.');
       return;
     }
-    // await getGitProjectName()
 
     const variables = {
       input: {
-        title: `Github Project ${github.repository} Summary - Issue #${await getGitPushNumber()}`,
+        title: `Github Project ${await getGitProjectName()} Summary - Issue #${await getGitPushNumber()}`,
         subtitle: 'Summary of changes and code changes for the latest push to the Github project.',
         publicationId: hashnodeBlogId,
         contentMarkdown: await generateBlogContent(),
