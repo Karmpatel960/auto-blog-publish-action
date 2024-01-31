@@ -88,45 +88,45 @@ const generateBlogContent = async () => {
 };
 
 const publishBlogPost = async () => {
-  try {
-    const hashnodeApiKey = process.env.HASHNODE_API_KEY;
-    const hashnodeBlogId = process.env.HASHNODE_BLOG_ID;
-    const apiUrl = 'https://gql.hashnode.com';
+  const hashnodeApiKey = process.env.HASHNODE_API_KEY;
+  const hashnodeBlogId = process.env.HASHNODE_BLOG_ID;
+  const apiUrl = 'https://gql.hashnode.com';
 
-    const query = `
-      mutation PublishPost($input: PublishPostInput!) {
-        publishPost(input: $input) {
-          post {
-            id
-            title
-            slug
-            publishedAt
-          }
+  const query = `
+    mutation PublishPost($input: PublishPostInput!) {
+      publishPost(input: $input) {
+        post {
+          id
+          title
+          slug
+          publishedAt
         }
       }
-    `;
-
-    if (!hashnodeApiKey) {
-      console.error('Error: HASHNODE_API_KEY is missing or empty.');
-      return;
     }
+  `;
 
-    const variables = {
-      input: {
-        title: `Github Project ${await getGitProjectName()} Summary - Issue #${await getGitPushNumber()}`,
-        subtitle: 'Summary of changes and code changes for the latest push to the Github project.',
-        publicationId: hashnodeBlogId,
-        contentMarkdown: await generateBlogContent(),
-        publishedAt: new Date().toISOString(),
-        tags: [
-          {
-            slug: "issueblog",
-            name: "Issue Blog",
-          },
-        ],
-      },
-    };
+  if (!hashnodeApiKey) {
+    console.error('Error: HASHNODE_API_KEY is missing or empty.');
+    return;
+  }
 
+  const variables = {
+    input: {
+      title: `Github Project ${await getGitProjectName()} Summary - Issue #${await getGitPushNumber()}`,
+      subtitle: 'Summary of changes and code changes for the latest push to the Github project.',
+      publicationId: hashnodeBlogId,
+      contentMarkdown: await generateBlogContent(),
+      publishedAt: new Date().toISOString(),
+      tags: [
+        {
+          slug: "issueblog",
+          name: "Issue Blog",
+        },
+      ],
+    },
+  };
+
+  try {
     const response = await axios.post(
       apiUrl,
       {
@@ -141,18 +141,26 @@ const publishBlogPost = async () => {
       }
     );
 
-    if (response.data.errors) {
+    if (!response) {
+      console.error('Error: No response received.');
+      return;
+    }
+
+    if (response.data && response.data.errors) {
       console.error('API Response:', response.data);
       console.error('Error publishing blog post:', response.data.errors);
-    } else {
+    } else if (response.data && response.data.data && response.data.data.publishPost && response.data.data.publishPost.post) {
       const publishedPost = response.data.data.publishPost.post;
       console.log('Blog post published successfully:', publishedPost.title);
+    } else {
+      console.error('Unexpected API response:', response.data);
     }
   } catch (error) {
-    console.log('API Response:', error.response.data);
     console.error('Error publishing blog post:', error.message);
   }
 };
+
+
 
 const main = async () => {
   await publishBlogPost();
