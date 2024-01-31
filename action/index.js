@@ -4,18 +4,24 @@ require('dotenv').config();
 
 const getGitPushNumber = async () => {
   let gitPushNumber;
-  await exec.exec('git', ['log', '--format=%B', '-n', '1'], {
-    listeners: {
-      stdout: (data) => {
-        const commitMessage = data.toString().trim();
-        console.log('Commit Message:', commitMessage); // Add this line for debugging
-
-        const commitParts = commitMessage.split(/\s+/);
-        gitPushNumber = commitParts[commitParts.length - 1];
-        console.log('Commit/Issue Number:', gitPushNumber); // Add this line for debugging
+  try {
+    let commitMessage = '';
+    await exec('git', ['log', '--format=%B', '-n', '1'], {
+      listeners: {
+        stdout: (data) => {
+          commitMessage += data.toString();
+        },
       },
-    },
-  });
+    });
+
+    console.log('Commit Message:', commitMessage.trim()); // Add this line for debugging
+
+    const match = commitMessage.match(/Issue #(\d+)/i);
+    gitPushNumber = match ? match[1] : null;
+    console.log('Commit/Issue Number:', gitPushNumber); // Add this line for debugging
+  } catch (error) {
+    console.error('Error getting Git push number:', error.message);
+  }
   return gitPushNumber;
 };
 
