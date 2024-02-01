@@ -73,18 +73,66 @@ const getGitCommitDetails = async () => {
   }
 };
 
+const getGitDiffSummary = async () => {
+  try {
+    const gitDiffCommand = 'git diff HEAD^ HEAD'; 
+    let gitDiff = '';
+
+    await exec(gitDiffCommand, [], {
+      listeners: {
+        stdout: (data) => {
+          gitDiff += data.toString();
+        },
+      },
+    });
+
+    console.log('Git Diff:', gitDiff);
+
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+
+    const openaiEndpoint = 'https://api.openai.com/v1/engines/davinci-codex/completions';
+    const openaiPrompt = `Summarize the following Git diff:\n${gitDiff}`;
+
+    const response = await axios.post(
+      openaiEndpoint,
+      {
+        prompt: openaiPrompt,
+        max_tokens: 150,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiApiKey}`,
+        },
+      }
+    );
+
+    if (response.data && response.data.choices && response.data.choices.length > 0) {
+      const summary = response.data.choices[0].text.trim();
+      console.log('Summary:', summary);
+      return summary;
+    } else {
+      console.error('Error retrieving summary from OpenAI.');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error getting Git diff summary:', error.message);
+    return null;
+  }
+};
+
 const generateBlogContent = async () => {
   try {
     const gitPushNumber = await getGitPushNumber();
     const commitDetails = await getGitCommitDetails();
-    const changesSummary = 'Summary of changes';
+    const changesSummary = await getGitDiffSummary();
     const codeChanges = 'Code changes'; 
 
     return `
-      # Git Push Number: ${gitPushNumber}
-      # Commit Number: ${commitDetails.number}
-      # Author: ${commitDetails.author}
-      # Commit Link: ${commitDetails.link}
+      ## Git Push Number: ${gitPushNumber}
+      ### Commit Number: ${commitDetails.number}
+      ### Author: ${commitDetails.author}
+      ### Commit Link: ${commitDetails.link}
   
       ## Changes Summary
       ${changesSummary}
