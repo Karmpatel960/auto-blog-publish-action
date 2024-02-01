@@ -75,7 +75,7 @@ const getGitCommitDetails = async () => {
 
 const getGitDiffSummary = async () => {
   try {
-    const gitDiffCommand = 'git diff HEAD~1 HEAD'; 
+    const gitDiffCommand = 'git diff HEAD'; 
     let gitDiff = '';
 
     await exec(gitDiffCommand, [], {
