@@ -77,7 +77,7 @@ const getGitDiffSummary = async () => {
   const commitHash = process.env.GITHUB_SHA;
 
   try {
-    const gitDiffCommand = `git diff ${commitHash}^ -- ${commitHash}`;
+    const gitDiffCommand = `git format-patch -1 ${commitHash}`;
     let gitDiff = '';
 
     await exec(gitDiffCommand, [], {
@@ -94,6 +94,7 @@ const getGitDiffSummary = async () => {
     const openaiEndpoint = 'https://api.openai.com/v1/completions';
     const openaiPrompt = `Summarize the following Git diff:\n${gitDiff}`;
     console.log('OpenAI Prompt:', openaiPrompt);
+
     const response = await axios.post(
       openaiEndpoint,
       {
@@ -113,7 +114,7 @@ const getGitDiffSummary = async () => {
       console.log('Summary:', summary);
       return summary;
     } else {
-      console.error('Error retrieving summary from OpenAI.');
+      console.error('Error retrieving summary from OpenAI:', response.data.error || 'Unknown error');
       return null;
     }
   } catch (error) {
