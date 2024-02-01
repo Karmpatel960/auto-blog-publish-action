@@ -75,7 +75,7 @@ const getGitCommitDetails = async () => {
 
 const getGitDiffSummary = async () => {
   try {
-    const gitDiffCommand = 'git diff HEAD'; 
+    const gitDiffCommand = 'git diff --name-status HEAD~1..HEAD'; 
     let gitDiff = '';
 
     await exec(gitDiffCommand, [], {
@@ -90,7 +90,7 @@ const getGitDiffSummary = async () => {
 
     const openaiApiKey = process.env.OPENAI_API_KEY;
 
-    const openaiEndpoint = 'https://api.openai.com/v1/engines/davinci-codex/completions';
+    const openaiEndpoint = 'https://api.openai.com/v1/completions';
     const openaiPrompt = `Summarize the following Git diff:\n${gitDiff}`;
 
     const response = await axios.post(
