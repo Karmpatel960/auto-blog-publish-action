@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const axios = require("axios");
 const { exec } = require('@actions/exec');
 require('dotenv').config();
@@ -81,7 +82,8 @@ const getGitDiffSummary = async () => {
     const patchFileName = 'changes.patch';
     await exec(`${gitPatchCommand} -o ${patchFileName}`);
 
-    const patchContent = fs.readFileSync(patchFileName, 'utf-8');
+    const patchFilePath = path.join(process.cwd(), patchFileName);
+    const patchContent = fs.readFileSync(patchFilePath, 'utf-8');
 
     console.log('Git Patch Content:', patchContent);
 
