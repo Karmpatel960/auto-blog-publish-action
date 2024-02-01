@@ -1,11 +1,7 @@
 const fs = require("fs");
 const axios = require("axios");
 const { exec } = require('@actions/exec');
-import OpenAI from "openai";
 require('dotenv').config();
-
-
-const openai = new OpenAI();
 
 const getGitPushNumber = async () => {
   let gitPushNumber;
@@ -79,6 +75,7 @@ const getGitCommitDetails = async () => {
 
 const getGitDiffSummary = async () => {
   const commitHash = process.env.GITHUB_SHA;
+
   try {
     const gitDiffCommand = `git diff --name-status ${commitHash}..HEAD`;
     let gitDiff = '';
@@ -93,17 +90,26 @@ const getGitDiffSummary = async () => {
 
     console.log('Git Diff:', gitDiff);
 
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    const openaiEndpoint = 'https://api.openai.com/v1/completions';
     const openaiPrompt = `Summarize the following Git diff:\n${gitDiff}`;
-    const openaiCompletion = await openai.Completion.create({
-      model: "gpt-3.5-turbo-instruct",
-      prompt: openaiPrompt,
-      max_tokens: 150,
-      temperature: 0,
-      n: 1,
-    });
 
-    if (openaiCompletion && openaiCompletion.choices && openaiCompletion.choices.length > 0) {
-      const summary = openaiCompletion.choices[0].text.trim();
+    const response = await axios.post(
+      openaiEndpoint,
+      {
+        prompt: openaiPrompt,
+        max_tokens: 150,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiApiKey}`,
+        },
+      }
+    );
+
+    if (response.data && response.data.choices && response.data.choices.length > 0) {
+      const summary = response.data.choices[0].text.trim();
       console.log('Summary:', summary);
       return summary;
     } else {
