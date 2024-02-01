@@ -77,7 +77,7 @@ const getGitDiffSummary = async () => {
   const commitHash = process.env.GITHUB_SHA;
 
   try {
-    const gitDiffCommand = `git diff ${commitHash}^ ${commitHash}`;
+    const gitDiffCommand = `git diff ${commitHash}^  --${commitHash}`;
     let gitDiff = '';
 
     await exec(gitDiffCommand, [], {
