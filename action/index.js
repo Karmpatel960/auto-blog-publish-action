@@ -77,24 +77,18 @@ const getGitDiffSummary = async () => {
   const commitHash = process.env.GITHUB_SHA;
 
   try {
-    const gitDiffCommand = `git format-patch -1 ${commitHash}`;
-    let gitDiff = '';
+    const gitPatchCommand = `git format-patch -1 ${commitHash}`;
+    const patchFileName = 'changes.patch';
+    await exec(`${gitPatchCommand} -o ${patchFileName}`);
 
-    await exec(gitDiffCommand, [], {
-      listeners: {
-        stdout: (data) => {
-          gitDiff += data.toString();
-        },
-      },
-    });
+    const patchContent = fs.readFileSync(patchFileName, 'utf-8');
 
-    console.log('Git Diff:', gitDiff);
+    console.log('Git Patch Content:', patchContent);
 
     const openaiApiKey = process.env.OPENAI_API_KEY;
     const openaiEndpoint = 'https://api.openai.com/v1/completions';
-    const openaiPrompt = `Summarize the following Git diff:\n${gitDiff}`;
-    console.log('OpenAI Prompt:', openaiPrompt);
-
+    const openaiPrompt = `Summarize the following Git diff:\n${patchContent}`;
+    
     const response = await axios.post(
       openaiEndpoint,
       {
@@ -114,7 +108,7 @@ const getGitDiffSummary = async () => {
       console.log('Summary:', summary);
       return summary;
     } else {
-      console.error('Error retrieving summary from OpenAI:', response.data.error || 'Unknown error');
+      console.error('Error retrieving summary from OpenAI.');
       return null;
     }
   } catch (error) {
