@@ -78,11 +78,12 @@ const getGitDiffSummary = async () => {
   const commitHash = process.env.GITHUB_SHA;
 
   try {
-    const gitPatchCommand = `git format-patch -1 ${commitHash}`;
     const patchFileName = 'changes.patch';
-    await exec(`${gitPatchCommand} -o ${patchFileName}`);
-
     const patchFilePath = path.join(process.cwd(), patchFileName);
+
+    const gitPatchCommand = `git format-patch -1 ${commitHash} -o ${patchFileName}`;
+    await exec(gitPatchCommand);
+
     const patchContent = fs.readFileSync(patchFilePath, 'utf-8');
 
     console.log('Git Patch Content:', patchContent);
