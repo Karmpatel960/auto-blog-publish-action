@@ -75,7 +75,7 @@ const getGitCommitDetails = async () => {
 
 const getGitDiffSummary = async () => {
   try {
-    const gitDiffCommand = 'git diff HEAD^ HEAD'; 
+    const gitDiffCommand = 'git diff HEAD~1 HEAD'; 
     let gitDiff = '';
 
     await exec(gitDiffCommand, [], {
@@ -129,10 +129,10 @@ const generateBlogContent = async () => {
     const codeChanges = 'Code changes'; 
 
     return `
-      ## Git Push Number: ${gitPushNumber}
-      ### Commit Number: ${commitDetails.number}
-      ### Author: ${commitDetails.author}
-      ### Commit Link: ${commitDetails.link}
+      #### Git Push Number: ${gitPushNumber}
+      #### Commit Number: ${commitDetails.number}
+      #### Author: ${commitDetails.author}
+      #### Commit Link: ${commitDetails.link}
   
       ## Changes Summary
       ${changesSummary}
@@ -178,7 +178,7 @@ const publishBlogPost = async () => {
 
   const variables = {
     input: {
-      title: `Github Project ${await getGitProjectName()} Summary - Issue #${await getGitPushNumber()}`,
+      title: `Project - ${await getGitProjectName()} Summary - Issue #${await getGitPushNumber()}`,
       subtitle: 'Summary of changes and code changes for the latest push to the Github project.',
       publicationId: hashnodeBlogId,
       contentMarkdown: await generateBlogContent(),
