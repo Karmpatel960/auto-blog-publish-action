@@ -93,7 +93,7 @@ const getGitDiffSummary = async () => {
     const openaiApiKey = process.env.OPENAI_API_KEY;
     const openaiEndpoint = 'https://api.openai.com/v1/completions';
     const openaiPrompt = `Summarize the following Git diff:\n${gitDiff}`;
-
+    console.log('OpenAI Prompt:', openaiPrompt);
     const response = await axios.post(
       openaiEndpoint,
       {
