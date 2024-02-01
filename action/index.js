@@ -77,7 +77,7 @@ const getGitDiffSummary = async () => {
   const commitHash = process.env.GITHUB_SHA;
 
   try {
-    const gitDiffCommand = `git diff --name-status ${commitHash}..HEAD`;
+    const gitDiffCommand = `git diff --name-status ${commitHash} HEAD`;
     let gitDiff = '';
 
     await exec(gitDiffCommand, [], {
@@ -98,7 +98,7 @@ const getGitDiffSummary = async () => {
       openaiEndpoint,
       {
         prompt: openaiPrompt,
-        max_tokens: 150,
+        max_tokens: 200,
       },
       {
         headers: {
