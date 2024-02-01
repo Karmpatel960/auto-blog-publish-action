@@ -28,18 +28,23 @@ const getGitPushNumber = async () => {
 
 const getGitProjectName = async () => {
   let gitProjectPath;
-  await exec.exec('git', ['rev-parse', '--show-toplevel'], {
-    listeners: {
-      stdout: (data) => {
-        gitProjectPath = data.toString().trim();
+  try {
+    await exec('git', ['rev-parse', '--show-toplevel'], {
+      listeners: {
+        stdout: (data) => {
+          gitProjectPath = data.toString().trim();
+        },
       },
-    },
-  });
+    });
 
-  const pathParts = gitProjectPath.split('/');
-  const repoName = pathParts[pathParts.length - 1];
+    const pathParts = gitProjectPath.split('/');
+    const repoName = pathParts[pathParts.length - 1];
 
-  return repoName;
+    return repoName;
+  } catch (error) {
+    console.error('Error getting Git project name:', error.message);
+    return null;
+  }
 };
 
 const getGitCommitDetails = async () => {
@@ -89,7 +94,7 @@ const generateBlogContent = async () => {
       ${codeChanges}
       \`\`\`
   
-      ## Latest Commit
+      ## Contributor
       ${commitDetails.link} - ${commitDetails.number} by ${commitDetails.author}
     `;
   } catch (error) {

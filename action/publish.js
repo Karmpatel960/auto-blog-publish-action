@@ -40,13 +40,15 @@ const getGitProjectName = async () => {
 
 
 const getLatestCommitTitle = async () => {
-  const commitSha = process.env.GITHUB_SHA;
-  const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${commitSha}`;
-  
   try {
+    console.log('GITHUB_TOKEN:', process.env.repo_token); // Make sure the token is available
+
+    const commitSha = process.env.GITHUB_SHA;
+    const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${commitSha}`;
+    
     const response = await axios.get(apiUrl, {
       headers: {
-        'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+        'Authorization': `Bearer ${process.env.repo_token}`, // Use repo_token as the variable name
       },
     });
 
@@ -56,6 +58,7 @@ const getLatestCommitTitle = async () => {
     return 'N/A';
   }
 };
+
 
 const generateBlogContent = async () => {
   const gitPushNumber = await getGitPushNumber();
