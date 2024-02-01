@@ -79,11 +79,12 @@ const getGitDiffSummary = async () => {
 
   try {
     const patchFileName = 'changes.patch';
-    const patchFilePath = path.join(process.cwd(), patchFileName);
 
-    const gitPatchCommand = `git format-patch -1 ${commitHash} -o ${patchFileName}`;
+    // Use --stdout to direct the output to the file directly
+    const gitPatchCommand = `/usr/bin/git format-patch -1 ${commitHash} --stdout > ${patchFileName}`;
     await exec(gitPatchCommand);
 
+    const patchFilePath = path.join(process.cwd(), patchFileName);
     const patchContent = fs.readFileSync(patchFilePath, 'utf-8');
 
     console.log('Git Patch Content:', patchContent);
@@ -119,6 +120,7 @@ const getGitDiffSummary = async () => {
     return null;
   }
 };
+
 
 const generateBlogContent = async () => {
   try {
