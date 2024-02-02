@@ -82,6 +82,8 @@ const getGitCommitDetails = async () => {
   }
 };
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 const getGitDiffSummary = async () => {
   const commitHash = process.env.GITHUB_SHA;
 
@@ -97,7 +99,7 @@ const getGitDiffSummary = async () => {
       { role: 'user', content: 'Summarize the following Git diff:' },
     ];
 
-    const maxLines = 100;
+    const maxLines = 50;
     diffLines.slice(0, maxLines).forEach(line => {
       messages.push({ role: 'user', content: line });
     });
@@ -116,8 +118,15 @@ const getGitDiffSummary = async () => {
       return null;
     }
   } catch (error) {
-    console.error('Error getting Git diff summary:', error.message);
-    return null;
+    if (error.response && error.response.status === 429) {
+      console.error('Rate limit exceeded. Waiting for cooldown...');
+      
+      await sleep(5000); 
+      return getGitDiffSummary();
+    } else {
+      console.error('Error getting Git diff summary:', error.message);
+      return null;
+    }
   }
 };
 
