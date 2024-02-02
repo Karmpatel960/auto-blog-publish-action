@@ -82,31 +82,42 @@ const getGitCommitDetails = async () => {
   }
 };
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
 const getGitDiffSummary = async () => {
+  const repoToken = process.env.REPO_TOKEN;
   const commitHash = process.env.GITHUB_SHA;
 
   try {
-    const gitPatchCommand = `/usr/bin/git diff ${commitHash} --patch --no-color --pretty=format:`;
-    const patchContent = execSync(gitPatchCommand, { shell: '/bin/bash' }).toString();
+    const repoInfoUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}`;
+    const repoInfoResponse = await axios.get(repoInfoUrl, {
+      headers: {
+        Authorization: `Bearer ${repoToken}`,
+      },
+    });
+
+    const owner = repoInfoResponse.data.owner.login;
+    const repo = repoInfoResponse.data.name;
+
+    const commitDiffUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${commitHash}`;
+    const commitDiffResponse = await axios.get(commitDiffUrl, {
+      headers: {
+        Authorization: `Bearer ${repoToken}`,
+      },
+    });
+
+    const patchContent = commitDiffResponse.data.files.map(file => file.patch).join('\n\n');
 
     const diffLines = patchContent.split('\n');
-    console.log(diffLines)
+
+    const prompt = diffLines.slice(0, 75).join('\n');
 
     const messages = [
       { role: 'system', content: 'You are a helpful assistant.' },
-      { role: 'user', content: 'Summarize the following Git diff:' },
+      { role: 'user', content: `Summarize the following Git diff:\n${prompt}` },
     ];
 
-    const maxLines = 50;
-    diffLines.slice(0, maxLines).forEach(line => {
-      messages.push({ role: 'user', content: line });
-    });
-
     const response = await openai.chat.completions.create({
-        messages,
-        model: "gpt-3.5-turbo",
+      messages,
+      model: 'gpt-3.5-turbo',
     });
 
     if (response && response.choices && response.choices.length > 0) {
@@ -118,15 +129,8 @@ const getGitDiffSummary = async () => {
       return null;
     }
   } catch (error) {
-    if (error.response && error.response.status === 429) {
-      console.error('Rate limit exceeded. Waiting for cooldown...');
-      
-      await sleep(5000); 
-      return getGitDiffSummary();
-    } else {
-      console.error('Error getting Git diff summary:', error.message);
-      return null;
-    }
+    console.error('Error getting Git diff summary:', error.message);
+    return null;
   }
 };
 
