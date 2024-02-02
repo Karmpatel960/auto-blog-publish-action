@@ -3,6 +3,7 @@ const path = require("path");
 const axios = require('axios');
 const { exec } = require('@actions/exec');
 const openai = require('openai');
+const { execSync } = require('child_process');
 require('dotenv').config();
 
 const getGitPushNumber = async () => {
@@ -81,7 +82,7 @@ const getGitDiffSummary = async () => {
   try {
     const patchFileName = 'changes.patch';
     const gitPatchCommand = `/usr/bin/git format-patch -1 ${commitHash} --stdout`;
-    const patchContent = await exec(gitPatchCommand, { shell: '/bin/bash', silent: true });
+    const patchContent = execSync(gitPatchCommand, { shell: '/bin/bash' }).toString();
 
     // Save the patch content to a file
     const patchFilePath = path.join(process.cwd(), patchFileName);
