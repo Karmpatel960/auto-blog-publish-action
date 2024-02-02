@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
-const axios = require("axios");
 const { exec } = require('@actions/exec');
+const openai = require('openai');
 require('dotenv').config();
 
 const getGitPushNumber = async () => {
@@ -81,7 +81,6 @@ const getGitDiffSummary = async () => {
     const patchFileName = 'changes.patch';
     const gitPatchCommand = `git format-patch -1 ${commitHash} --stdout > ${patchFileName}`;
     await exec(gitPatchCommand, { shell: '/bin/bash' });
-    
 
     const patchFilePath = path.join(process.cwd(), patchFileName);
     const patchContent = fs.readFileSync(patchFilePath, 'utf-8');
@@ -89,29 +88,22 @@ const getGitDiffSummary = async () => {
     console.log('Git Patch Content:', patchContent);
 
     const openaiApiKey = process.env.OPENAI_API_KEY;
-    const openaiEndpoint = 'https://api.openai.com/v1/completions';
-    const openaiPrompt = `Summarize the following Git diff:\n${patchContent}`;
-    
-    const response = await axios.post(
-      openaiEndpoint,
-      {
-        prompt: openaiPrompt,
-        max_tokens: 200,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openaiApiKey}`,
-        },
-      }
-    );
+    const openaiEndpoint = 'https://api.openai.com/v1/chat/completions';
 
-    if (response.data && response.data.choices && response.data.choices.length > 0) {
-      const summary = response.data.choices[0].text.trim();
+    const response = await openai.ChatCompletion.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: `Summarize the following Git diff:\n${patchContent}` },
+      ],
+    });
+
+    if (response && response.choices && response.choices.length > 0) {
+      const summary = response.choices[0].message.content.trim();
       console.log('Summary:', summary);
       return summary;
     } else {
-      console.error('Error retrieving summary from OpenAI.');
+      console.error('Error retrieving summary from ChatGPT.');
       return null;
     }
   } catch (error) {
@@ -134,8 +126,6 @@ const generateBlogContent = async () => {
     return `
     #### Git Push Number: ${gitPushNumber}
     #### Commit Number: [${commitDetails.number}](${commitDetails.link})
-    #### Author: ${commitDetails.author}
-    #### Commit Link: [${commitDetails.link}](${commitDetails.link})
   
       ## Changes Summary
       ${changesSummary}
