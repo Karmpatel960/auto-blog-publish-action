@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const axios = require('axios');
 const { exec } = require('@actions/exec');
 const openai = require('openai');
 require('dotenv').config();
@@ -79,8 +80,9 @@ const getGitDiffSummary = async () => {
 
   try {
     const patchFileName = 'changes.patch';
-    const gitPatchCommand = `git format-patch -1 ${commitHash} --stdout > ${patchFileName}`;
-    await exec(gitPatchCommand, { shell: '/bin/bash' });
+    const gitPatchCommand = `/usr/bin/git format-patch -1 ${commitHash} --stdout > ${patchFileName}`;
+await exec(gitPatchCommand, { shell: '/bin/bash', maxBuffer: Infinity });
+
 
     const patchFilePath = path.join(process.cwd(), patchFileName);
     const patchContent = fs.readFileSync(patchFilePath, 'utf-8');
