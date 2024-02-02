@@ -2,7 +2,7 @@
   "name": "auto-blog-publish-action",
   "version": "1.0.0",
   "description": "It will publish automatically to your hashnode and it will generate blog for it",
-  "main": "index.js",
+  "main": "index.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
