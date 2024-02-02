@@ -133,13 +133,42 @@ const getGitDiffSummary = async () => {
   }
 };
 
+const getGitDiffFile = async () => {
+  const repoToken = process.env.REPO_TOKEN;
+  const commitHash = process.env.GITHUB_SHA;
+
+  try {
+    const repoInfoUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}`;
+    const repoInfoResponse = await axios.get(repoInfoUrl, {
+      headers: {
+        Authorization: `Bearer ${repoToken}`,
+      },
+    });
+
+    const owner = repoInfoResponse.data.owner.login;
+    const repo = repoInfoResponse.data.name;
+
+    const commitDiffUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${commitHash}.diff`;
+    const commitDiffResponse = await axios.get(commitDiffUrl, {
+      headers: {
+        Authorization: `Bearer ${repoToken}`,
+      },
+    });
+
+    return commitDiffResponse.data;
+  } catch (error) {
+    console.error('Error getting Git diff file:', error.message);
+    return null;
+  }
+};
+
 
 const generateBlogContent = async () => {
   try {
     const gitPushNumber = await getGitPushNumber();
     const commitDetails = await getGitCommitDetails();
     const changesSummary = await getGitDiffSummary();
-    const codeChanges = 'Code changes';
+    const codeChanges = await getGitDiffFile();
     
     const contributorsPhotos = await getContributorsPhotos();
     
