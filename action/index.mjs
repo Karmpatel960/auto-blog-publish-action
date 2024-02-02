@@ -1,10 +1,11 @@
-const fs = require("fs");
-const path = require("path");
-const axios = require('axios');
-const { exec } = require('@actions/exec');
-const OpenAI = require('openai');
-const { execSync } = require('child_process');
-require('dotenv').config();
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import axios from 'axios';
+import dotenv from 'dotenv';
+import OpenAI from "openai";
+
+dotenv.config();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -100,7 +101,7 @@ const getGitDiffSummary = async () => {
 
     const response = await openai.ChatCompletion.create({
       messages,
-      model: "gpt-3.5-turbo",
+      model: 'gpt-3.5-turbo',
     });
 
     if (response && response.choices && response.choices.length > 0) {
@@ -127,7 +128,6 @@ const generateBlogContent = async () => {
     const changesSummary = await getGitDiffSummary();
     const codeChanges = 'Code changes';
     
-    // Fetch contributors' profile photos from GitHub
     const contributorsPhotos = await getContributorsPhotos();
     
     return `
