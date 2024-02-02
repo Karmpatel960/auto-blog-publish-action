@@ -89,6 +89,7 @@ const getGitDiffSummary = async () => {
     const patchContent = execSync(gitPatchCommand, { shell: '/bin/bash' }).toString();
 
     const diffLines = patchContent.split('\n');
+    console.log(diffLines)
 
     const messages = [
       { role: 'system', content: 'You are a helpful assistant.' },
@@ -99,9 +100,9 @@ const getGitDiffSummary = async () => {
       messages.push({ role: 'user', content: line });
     });
 
-    const response = await openai.ChatCompletion.create({
-      messages,
-      model: 'gpt-3.5-turbo',
+    const response = await openai.chat.completions.create({
+        messages,
+        model: "gpt-3.5-turbo",
     });
 
     if (response && response.choices && response.choices.length > 0) {
@@ -270,4 +271,4 @@ const main = async () => {
   await publishBlogPost();
 };
 
-main();
+export { main };
