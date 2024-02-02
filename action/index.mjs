@@ -108,10 +108,9 @@ const getGitDiffSummary = async () => {
 
     const diffLines = patchContent.split('\n');
 
-    const prompt = diffLines.slice(0, 75).join('\n');
+    const prompt = diffLines.slice(0, 5).join('\n');
 
     const messages = [
-      { role: 'system', content: 'You are a helpful assistant.' },
       { role: 'user', content: `Summarize the following Git diff:\n${prompt}` },
     ];
 
