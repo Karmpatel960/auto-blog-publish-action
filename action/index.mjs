@@ -191,18 +191,18 @@ const getGitDiff = async () => {
 
     const addedFilesSummary = filesAdded.map(file => {
       return `
-### Added: ${file.filename}
+#### Added: ${file.filename}
 \`\`\`diff
 ${file.patch}
 \`\`\`
 `;
     }).join('\n');
 
-    const deletedFilesSummary = filesDeleted.map(file => `### Deleted: ${file.filename}`).join('\n');
+    const deletedFilesSummary = filesDeleted.map(file => `#### Deleted: ${file.filename}`).join('\n');
 
     const modifiedFilesSummary = filesModified.map(file => {
       return `
-### Modified: ${file.filename}
+#### Modified: ${file.filename}
 \`\`\`diff
 ${file.patch}
 \`\`\`
@@ -224,8 +224,6 @@ ${modifiedFilesSummary}
   }
 };
 
-
-
 const generateBlogContent = async () => {
   try {
     const gitPushNumber = await getGitPushNumber();
@@ -236,19 +234,19 @@ const generateBlogContent = async () => {
     const contributorsPhotos = await getContributorsPhotos();
     
     return `
-    ## Github Project Detail
-    #### Git Push Number: ${gitPushNumber}
-    #### Commit Number: [${commitDetails.number}](${commitDetails.link})
+## Github Project Detail
+#### Git Push Number: ${gitPushNumber}
+#### Commit Number: [${commitDetails.number}](${commitDetails.link})
     
-    ## Changes Summary
+## Changes Summary
 
-    ${codeChanges}
+${codeChanges}
   
-      ## Contributors
-      ${contributorsPhotos.map(contributor => `
-        [![${contributor.login}](${contributor.avatar_url}&s=50)](${contributor.html_url}) - ${contributor.login}
-      `).join('\n')}
-    `;
+## Contributors
+${contributorsPhotos.map(contributor => `
+  [![${contributor.login}](${contributor.avatar_url}&s=50)](${contributor.html_url}) - ${contributor.login}
+`).join('\n')}
+`;
   } catch (error) {
     console.error('Error generating blog content:', error.message);
     return 'N/A';
