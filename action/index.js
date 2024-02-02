@@ -80,25 +80,23 @@ const getGitDiffSummary = async () => {
   const commitHash = process.env.GITHUB_SHA;
 
   try {
-    const patchFileName = 'changes.patch';
-    const gitPatchCommand = `/usr/bin/git format-patch -1 ${commitHash} --stdout`;
+    const gitPatchCommand = `/usr/bin/git show ${commitHash} --patch --no-color --pretty=format:`;
     const patchContent = execSync(gitPatchCommand, { shell: '/bin/bash' }).toString();
 
-    // Save the patch content to a file
-    const patchFilePath = path.join(process.cwd(), patchFileName);
-    fs.writeFileSync(patchFilePath, patchContent);
+    const diffLines = patchContent.split('\n');
 
-    console.log('Git Patch Content:', patchContent);
+    const messages = [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: 'Summarize the following Git diff:' },
+    ];
 
-    const openaiApiKey = process.env.OPENAI_API_KEY;
-    const openaiEndpoint = 'https://api.openai.com/v1/chat/completions';
+    diffLines.forEach(line => {
+      messages.push({ role: 'user', content: line });
+    });
 
     const response = await openai.ChatCompletion.create({
       model: 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        { role: 'user', content: `Summarize the following Git diff:\n${patchContent}` },
-      ],
+      messages,
     });
 
     if (response && response.choices && response.choices.length > 0) {
