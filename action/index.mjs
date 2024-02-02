@@ -116,7 +116,7 @@ const getGitDiffSummary = async () => {
 
     const response = await openai.chat.completions.create({
       messages,
-      model: 'text-embedding-ada-002',
+      model: 'gpt-3.5-turbo',
     });
 
     if (response && response.choices && response.choices.length > 0) {
