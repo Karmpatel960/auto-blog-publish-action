@@ -126,13 +126,16 @@ const generateBlogContent = async () => {
     const gitPushNumber = await getGitPushNumber();
     const commitDetails = await getGitCommitDetails();
     const changesSummary = await getGitDiffSummary();
-    const codeChanges = 'Code changes'; 
-
+    const codeChanges = 'Code changes';
+    
+    // Fetch contributors' profile photos from GitHub
+    const contributorsPhotos = await getContributorsPhotos();
+    
     return `
-      #### Git Push Number: ${gitPushNumber}
-      #### Commit Number: ${commitDetails.number}
-      #### Author: ${commitDetails.author}
-      #### Commit Link: ${commitDetails.link}
+    #### Git Push Number: ${gitPushNumber}
+    #### Commit Number: [${commitDetails.number}](${commitDetails.link})
+    #### Author: ${commitDetails.author}
+    #### Commit Link: [${commitDetails.link}](${commitDetails.link})
   
       ## Changes Summary
       ${changesSummary}
@@ -142,14 +145,52 @@ const generateBlogContent = async () => {
       ${codeChanges}
       \`\`\`
   
-      ## Contributor
-      ${commitDetails.link} - ${commitDetails.number} by ${commitDetails.author}
+      ## Contributors
+      ${contributorsPhotos.map(contributor => `
+        [![${contributor.login}](${contributor.avatar_url}&s=50)](${contributor.html_url}) - ${contributor.login}
+      `).join('\n')}
     `;
   } catch (error) {
     console.error('Error generating blog content:', error.message);
     return 'N/A';
   }
 };
+
+const getContributorsPhotos = async () => {
+  const contributors = await getContributorsList();
+  const contributorsWithPhotos = [];
+
+  for (const contributor of contributors) {
+    const response = await axios.get(contributor.url, {
+      headers: {
+        'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
+      },
+    });
+
+    if (response.data && response.data.avatar_url) {
+      contributorsWithPhotos.push({
+        login: contributor.login,
+        avatar_url: response.data.avatar_url,
+        html_url: contributor.html_url,
+      });
+    }
+  }
+
+  return contributorsWithPhotos;
+};
+
+const getContributorsList = async () => {
+  const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/contributors`;
+  
+  const response = await axios.get(apiUrl, {
+    headers: {
+      'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
+    },
+  });
+
+  return response.data;
+};
+
 
 
 
