@@ -97,7 +97,8 @@ const getGitDiffSummary = async () => {
       { role: 'user', content: 'Summarize the following Git diff:' },
     ];
 
-    diffLines.forEach(line => {
+    const maxLines = 100;
+    diffLines.slice(0, maxLines).forEach(line => {
       messages.push({ role: 'user', content: line });
     });
 
