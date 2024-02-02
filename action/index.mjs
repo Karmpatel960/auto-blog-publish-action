@@ -4,7 +4,7 @@ import path from 'path';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import OpenAI from "openai";
-import exec from "@actions/exec"
+const exec = require("@actions/exec");
 
 dotenv.config();
 
@@ -86,7 +86,7 @@ const getGitDiffSummary = async () => {
   const commitHash = process.env.GITHUB_SHA;
 
   try {
-    const gitPatchCommand = `/usr/bin/git show ${commitHash} --patch --no-color --pretty=format:`;
+    const gitPatchCommand = `/usr/bin/git diff ${commitHash} --patch --no-color --pretty=format:`;
     const patchContent = execSync(gitPatchCommand, { shell: '/bin/bash' }).toString();
 
     const diffLines = patchContent.split('\n');
@@ -120,8 +120,6 @@ const getGitDiffSummary = async () => {
     return null;
   }
 };
-
-
 
 
 const generateBlogContent = async () => {
@@ -190,8 +188,6 @@ const getContributorsList = async () => {
 
   return response.data;
 };
-
-
 
 
 const publishBlogPost = async () => {
