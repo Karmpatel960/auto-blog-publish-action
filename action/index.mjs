@@ -189,9 +189,9 @@ const getGitDiff = async () => {
     const filesDeleted = commitDiffResponse.data.files.filter(file => file.status === 'deleted');
     const filesModified = commitDiffResponse.data.files.filter(file => file.status === 'modified');
 
-    const addedFilesSummary = filesAdded.map(file => `Added: ${file.filename}`).join('\n');
+    const addedFilesSummary = filesAdded.map(file => `Added: ${file.filename}\n${file.patch}`).join('\n');
     const deletedFilesSummary = filesDeleted.map(file => `Deleted: ${file.filename}`).join('\n');
-    const modifiedFilesSummary = filesModified.map(file => `Modified: ${file.filename}`).join('\n');
+    const modifiedFilesSummary = filesModified.map(file => `Modified: ${file.filename}\n${file.patch}`).join('\n');
 
     const summary = `
       Files Added:\n${addedFilesSummary}\n
@@ -206,6 +206,7 @@ const getGitDiff = async () => {
     return null;
   }
 };
+
 
 
 const generateBlogContent = async () => {
