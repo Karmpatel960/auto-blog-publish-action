@@ -99,9 +99,9 @@ const getGitDiffSummary = async () => {
       messages.push({ role: 'user', content: line });
     });
 
-    const response = await openai.ChatCompletion.create({
-      messages,
-      model: 'gpt-3.5-turbo',
+    const response = await openai.chat.completions.create({
+        messages,
+        model: "gpt-3.5-turbo",
     });
 
     if (response && response.choices && response.choices.length > 0) {
