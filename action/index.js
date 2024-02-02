@@ -2,9 +2,13 @@ const fs = require("fs");
 const path = require("path");
 const axios = require('axios');
 const { exec } = require('@actions/exec');
-const openai = require('openai');
+const OpenAI = require('openai');
 const { execSync } = require('child_process');
 require('dotenv').config();
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 const getGitPushNumber = async () => {
   let gitPushNumber;
@@ -78,8 +82,6 @@ const getGitCommitDetails = async () => {
 
 const getGitDiffSummary = async () => {
   const commitHash = process.env.GITHUB_SHA;
-  openai.apiKey = process.env.OPENAI_API_KEY;
-
 
   try {
     const gitPatchCommand = `/usr/bin/git show ${commitHash} --patch --no-color --pretty=format:`;
@@ -96,12 +98,10 @@ const getGitDiffSummary = async () => {
       messages.push({ role: 'user', content: line });
     });
 
-    const requestBody = {
-      model: 'gpt-3.5-turbo',
+    const response = await openai.ChatCompletion.create({
       messages,
-    };
-
-    const response = await openai.complete(requestBody);
+      model: "gpt-3.5-turbo",
+    });
 
     if (response && response.choices && response.choices.length > 0) {
       const summary = response.choices[0].message.content.trim();
@@ -116,6 +116,7 @@ const getGitDiffSummary = async () => {
     return null;
   }
 };
+
 
 
 
