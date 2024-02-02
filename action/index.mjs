@@ -4,7 +4,7 @@ import path from 'path';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import OpenAI from "openai";
-const exec = require("@actions/exec");
+import { exec } from "@actions/exec";
 
 dotenv.config();
 
