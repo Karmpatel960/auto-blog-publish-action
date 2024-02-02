@@ -80,12 +80,12 @@ const getGitDiffSummary = async () => {
 
   try {
     const patchFileName = 'changes.patch';
-    const gitPatchCommand = `/usr/bin/git format-patch -1 ${commitHash} --stdout > ${patchFileName}`;
-await exec(gitPatchCommand, { shell: '/bin/bash', maxBuffer: Infinity });
+    const gitPatchCommand = `/usr/bin/git format-patch -1 ${commitHash} --stdout`;
+    const patchContent = await exec(gitPatchCommand, { shell: '/bin/bash', silent: true });
 
-
+    // Save the patch content to a file
     const patchFilePath = path.join(process.cwd(), patchFileName);
-    const patchContent = fs.readFileSync(patchFilePath, 'utf-8');
+    fs.writeFileSync(patchFilePath, patchContent);
 
     console.log('Git Patch Content:', patchContent);
 
@@ -113,6 +113,7 @@ await exec(gitPatchCommand, { shell: '/bin/bash', maxBuffer: Infinity });
     return null;
   }
 };
+
 
 
 const generateBlogContent = async () => {
