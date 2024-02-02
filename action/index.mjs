@@ -4,6 +4,7 @@ import path from 'path';
 import axios from 'axios';
 import dotenv from 'dotenv';
 import OpenAI from "openai";
+import exec from "@actions/exec"
 
 dotenv.config();
 
