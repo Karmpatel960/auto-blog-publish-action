@@ -89,6 +89,7 @@ const getGitDiffSummary = async () => {
     const patchContent = execSync(gitPatchCommand, { shell: '/bin/bash' }).toString();
 
     const diffLines = patchContent.split('\n');
+    console.log(diffLines)
 
     const messages = [
       { role: 'system', content: 'You are a helpful assistant.' },
