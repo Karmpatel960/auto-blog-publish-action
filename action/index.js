@@ -78,6 +78,8 @@ const getGitCommitDetails = async () => {
 
 const getGitDiffSummary = async () => {
   const commitHash = process.env.GITHUB_SHA;
+  openai.apiKey = process.env.OPENAI_API_KEY;
+
 
   try {
     const gitPatchCommand = `/usr/bin/git show ${commitHash} --patch --no-color --pretty=format:`;
