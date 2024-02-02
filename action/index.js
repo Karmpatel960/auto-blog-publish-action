@@ -96,10 +96,12 @@ const getGitDiffSummary = async () => {
       messages.push({ role: 'user', content: line });
     });
 
-    const response = await openai.ChatCompletion.create({
+    const requestBody = {
       model: 'gpt-3.5-turbo',
       messages,
-    });
+    };
+
+    const response = await openai.complete(requestBody);
 
     if (response && response.choices && response.choices.length > 0) {
       const summary = response.choices[0].message.content.trim();
