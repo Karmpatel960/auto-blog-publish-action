@@ -1,3 +1,3 @@
 
-import { main } from './action/index.mjs'; 
+import { main } from './src/publish.mjs'; 
 main();
