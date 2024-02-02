@@ -133,7 +133,37 @@ const getGitDiffSummary = async () => {
   }
 };
 
-const getGitDiffFile = async () => {
+// const getGitDiffFile = async () => {
+//   const repoToken = process.env.REPO_TOKEN;
+//   const commitHash = process.env.GITHUB_SHA;
+
+//   try {
+//     const repoInfoUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}`;
+//     const repoInfoResponse = await axios.get(repoInfoUrl, {
+//       headers: {
+//         Authorization: `Bearer ${repoToken}`,
+//       },
+//     });
+
+//     const owner = repoInfoResponse.data.owner.login;
+//     const repo = repoInfoResponse.data.name;
+
+//     const commitDiffUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${commitHash}.diff`;
+//     const commitDiffResponse = await axios.get(commitDiffUrl, {
+//       headers: {
+//         Authorization: `Bearer ${repoToken}`,
+//       },
+//     });
+
+//     return commitDiffResponse.data;
+//   } catch (error) {
+//     console.error('Error getting Git diff file:', error.message);
+//     return null;
+//   }
+// };
+
+
+const getGitDiff = async () => {
   const repoToken = process.env.REPO_TOKEN;
   const commitHash = process.env.GITHUB_SHA;
 
@@ -148,16 +178,31 @@ const getGitDiffFile = async () => {
     const owner = repoInfoResponse.data.owner.login;
     const repo = repoInfoResponse.data.name;
 
-    const commitDiffUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${commitHash}.diff`;
+    const commitDiffUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${commitHash}`;
     const commitDiffResponse = await axios.get(commitDiffUrl, {
       headers: {
         Authorization: `Bearer ${repoToken}`,
       },
     });
 
-    return commitDiffResponse.data;
+    const filesAdded = commitDiffResponse.data.files.filter(file => file.status === 'added');
+    const filesDeleted = commitDiffResponse.data.files.filter(file => file.status === 'deleted');
+    const filesModified = commitDiffResponse.data.files.filter(file => file.status === 'modified');
+
+    const addedFilesSummary = filesAdded.map(file => `Added: ${file.filename}`).join('\n');
+    const deletedFilesSummary = filesDeleted.map(file => `Deleted: ${file.filename}`).join('\n');
+    const modifiedFilesSummary = filesModified.map(file => `Modified: ${file.filename}`).join('\n');
+
+    const summary = `
+      Files Added:\n${addedFilesSummary}\n
+      Files Deleted:\n${deletedFilesSummary}\n
+      Files Modified:\n${modifiedFilesSummary}
+    `;
+
+    console.log('Summary:', summary);
+    return summary;
   } catch (error) {
-    console.error('Error getting Git diff file:', error.message);
+    console.error('Error getting Git diff summary:', error.message);
     return null;
   }
 };
@@ -168,15 +213,16 @@ const generateBlogContent = async () => {
     const gitPushNumber = await getGitPushNumber();
     const commitDetails = await getGitCommitDetails();
     const changesSummary = await getGitDiffSummary();
-    const codeChanges = await getGitDiffFile();
+    const codeChanges = await getGitDiff();
     
     const contributorsPhotos = await getContributorsPhotos();
     
     return `
+    ## Github Project Detail
     #### Git Push Number: ${gitPushNumber}
     #### Commit Number: [${commitDetails.number}](${commitDetails.link})
-  
-      ## Changes Summary
+    
+    ## Changes Summary
       ${changesSummary}
   
       ## Code Changes
