@@ -19,10 +19,6 @@ inputs:
     description: 'API key for OpenAI'
     required: true
 
-outputs:
-  publish:
-    description: 'Output for publish blog'
-
 runs:
   using: 'node16'
   main: 'index.mjs'
