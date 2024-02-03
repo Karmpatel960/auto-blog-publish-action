@@ -20,7 +20,7 @@ inputs:
     required: true
 
 runs:
-  using: 'node14'
+  using: 'node12'
   main: |
     cd .
     npm install
