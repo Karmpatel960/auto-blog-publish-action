@@ -9,9 +9,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: .
-        with:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Run Custom Action
+        run: |
+          cd .
+          npm install
+          node dist/index.mjs
+        env:
           HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
           HASHNODE_BLOG_ID: ${{ secrets.HASHNODE_BLOG_ID }}
           REPO_TOKEN: ${{ secrets.REPO_TOKEN }}

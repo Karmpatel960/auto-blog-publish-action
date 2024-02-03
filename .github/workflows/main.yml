@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Publish Blog Post
-        run: node dist/index.js
+        run: node dist/index.mjs
         env:
           HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
           HASHNODE_BLOG_ID: ${{ secrets.HASHNODE_BLOG_ID }}
