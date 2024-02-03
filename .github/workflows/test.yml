@@ -9,11 +9,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-      - name: Run Custom Action
-        uses: auto-blog-publish-action/
-        env:
+      - id: 'auto-blog-publish-action'
+        name: 'auto-blog-publish-action'
+        uses: './'
+        with:
           HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
           HASHNODE_BLOG_ID: ${{ secrets.HASHNODE_BLOG_ID }}
           REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
