@@ -56,31 +56,31 @@ const getGitProjectName = async () => {
   }
 };
 
-// const getGitCommitDetails = async () => {
-//   try {
-//     const commitSha = process.env.GITHUB_SHA;
-//     const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${commitSha}`;
+const getGitCommitDetails = async () => {
+  try {
+    const commitSha = process.env.GITHUB_SHA;
+    const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${commitSha}`;
     
-//     const response = await axios.get(apiUrl, {
-//       headers: {
-//         'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
-//       },
-//     });
+    const response = await axios.get(apiUrl, {
+      headers: {
+        'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
+      },
+    });
 
-//     const commitDetails = {
-//       number: response.data.sha.substring(0, 7),
-//       author: response.data.commit.author.name,
-//       link: response.data.html_url,
-//     };
+    const commitDetails = {
+      number: response.data.sha.substring(0, 7),
+      author: response.data.commit.author.name,
+      link: response.data.html_url,
+    };
 
-//     console.log('Commit Details:', commitDetails);
+    console.log('Commit Details:', commitDetails);
 
-//     return commitDetails;
-//   } catch (error) {
-//     console.error('Error fetching commit details:', error.message);
-//     return null;
-//   }
-// };
+    return commitDetails;
+  } catch (error) {
+    console.error('Error fetching commit details:', error.message);
+    return null;
+  }
+};
 
 // const getGitDiffSummary = async () => {
 //   const repoToken = process.env.REPO_TOKEN;
