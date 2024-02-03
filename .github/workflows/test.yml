@@ -9,6 +9,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - uses: 'actions/checkout@v4'
+
+      - uses: 'actions/setup-node@v4'
+        with:
+          node-version: '20.x'
+
+      - name: 'npm build'
+        run: 'npm ci && npm run build'
       - id: 'auto-blog-publish-action'
         name: 'auto-blog-publish-action'
         uses: './'
