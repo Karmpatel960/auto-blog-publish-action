@@ -73,7 +73,7 @@ const getGitCommitDetails = async () => {
     
     const response = await axios.get(apiUrl, {
       headers: {
-        'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
+        'Authorization': `Bearer ${getSecret("REPO_TOKEN")}`,
       },
     });
 
@@ -270,7 +270,7 @@ const getContributorsPhotos = async () => {
   for (const contributor of contributors) {
     const response = await axios.get(contributor.url, {
       headers: {
-        'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
+        'Authorization': `Bearer ${getSecret("REPO_TOKEN")}`,
       },
     });
 
@@ -291,7 +291,7 @@ const getContributorsList = async () => {
   
   const response = await axios.get(apiUrl, {
     headers: {
-      'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
+      'Authorization': `Bearer ${getSecret("REPO_TOKEN")}`,
     },
   });
 
