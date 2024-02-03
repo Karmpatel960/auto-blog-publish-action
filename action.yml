@@ -20,8 +20,12 @@ inputs:
     required: true
 
 runs:
-  using: 'node12'
-  main: 'index.mjs'
+  using: 'node14'
+  main: |
+    cd .
+    npm install
+    node index.mjs
+
 
 
 

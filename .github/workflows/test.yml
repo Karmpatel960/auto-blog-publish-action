@@ -12,10 +12,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Run Custom Action
-        run: |
-          cd .
-          npm install
-          node index.mjs
+        uses: .
         env:
           HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
           HASHNODE_BLOG_ID: ${{ secrets.HASHNODE_BLOG_ID }}
