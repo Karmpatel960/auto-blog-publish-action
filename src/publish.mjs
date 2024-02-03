@@ -5,7 +5,17 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 // import OpenAI from "openai";
 import { exec } from "@actions/exec";
+import * as core from "@actions/core";
 
+dotenv.config();
+
+const getSecret = (secretName) => {
+  const secret = core.getInput(secretName);
+  if (!secret) {
+    throw new Error(`${secretName} is missing or empty.`);
+  }
+  return secret;
+};
 dotenv.config();
 
 // const openai = new OpenAI({
@@ -164,7 +174,7 @@ const getGitCommitDetails = async () => {
 
 
 const getGitDiff = async () => {
-  const repoToken = process.env.REPO_TOKEN;
+  const repoToken = getSecret("REPO_TOKEN");
   const commitHash = process.env.GITHUB_SHA;
 
   try {
@@ -290,8 +300,8 @@ const getContributorsList = async () => {
 
 
 const publishBlogPost = async () => {
-  const hashnodeApiKey = process.env.HASHNODE_API_KEY;
-  const hashnodeBlogId = process.env.HASHNODE_BLOG_ID;
+  const hashnodeApiKey = getSecret('HASHNODE_API_KEY');
+  const hashnodeBlogId = getSecret('HASHNODE_BLOG_ID');
   const apiUrl = 'https://gql.hashnode.com';
 
   const query = `
