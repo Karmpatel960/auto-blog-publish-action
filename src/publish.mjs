@@ -69,7 +69,7 @@ const getGitProjectName = async () => {
 const getGitCommitDetails = async () => {
   try {
     const commitSha = process.env.GITHUB_SHA;
-    const apiUrl = `https://api.github.com/repos/${getSecret('GITHUB_REPOSITORY')}/commits/${commitSha}`;
+    const apiUrl = `https://api.github.com/repos/${getSecret('REPO_TOKEN')}/commits/${commitSha}`;
     
     const response = await axios.get(apiUrl, {
       headers: {
@@ -178,7 +178,7 @@ const getGitDiff = async () => {
   const commitHash = process.env.GITHUB_SHA;
 
   try {
-    const repoInfoUrl = `https://api.github.com/repos/${getSecret('GITHUB_REPOSITORY')}`;
+    const repoInfoUrl = `https://api.github.com/repos/${getSecret('REPO_TOKEN')}`;
     const repoInfoResponse = await axios.get(repoInfoUrl, {
       headers: {
         Authorization: `Bearer ${repoToken}`,
@@ -287,7 +287,7 @@ const getContributorsPhotos = async () => {
 };
 
 const getContributorsList = async () => {
-  const apiUrl = `https://api.github.com/repos/${getSecret('GITHUB_REPOSITORY')}/contributors`;
+  const apiUrl = `https://api.github.com/repos/${getSecret('REPO_TOKEN')}/contributors`;
   
   const response = await axios.get(apiUrl, {
     headers: {
