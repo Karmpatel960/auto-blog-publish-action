@@ -42,9 +42,10 @@ jobs:
       - name: Run Publish Action
         run: node index.mjs
         env:
-          HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
-          HASHNODE_BLOG_ID: ${{ secrets.HASHNODE_BLOG_ID }}
-          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          HASHNODE_API_KEY: ${{ inputs.hashnode-api-key }}
+          HASHNODE_BLOG_ID: ${{ inputs.hashnode-blog-id }}
+          REPO_TOKEN: ${{ inputs.repo-token }}
+          OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+
 
 
