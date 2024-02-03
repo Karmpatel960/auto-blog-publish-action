@@ -11,3 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
+        with:
+          HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
+          HASHNODE_BLOG_ID: ${{ secrets.HASHNODE_BLOG_ID }}
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
