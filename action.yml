@@ -20,32 +20,14 @@ inputs:
     required: true
 
 outputs:
-  publish-output:
+  publish:
     description: 'Output for publish blog'
 
-jobs:
-  publish:
-    runs-on: ubuntu-latest
+runs:
+  using: 'node16'
+  main: 'index.mjs'
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 14
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Run Publish Action
-        run: node index.mjs
-        env:
-          HASHNODE_API_KEY: ${{ inputs.hashnode-api-key }}
-          HASHNODE_BLOG_ID: ${{ inputs.hashnode-blog-id }}
-          REPO_TOKEN: ${{ inputs.repo-token }}
-          OPENAI_API_KEY: ${{ inputs.openai-api-key }}
 
 
 
