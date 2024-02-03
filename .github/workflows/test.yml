@@ -15,7 +15,7 @@ jobs:
         run: |
           cd .
           npm install
-          node dist/index.mjs
+          node index.mjs
         env:
           HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
           HASHNODE_BLOG_ID: ${{ secrets.HASHNODE_BLOG_ID }}
