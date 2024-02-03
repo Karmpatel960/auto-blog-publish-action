@@ -35177,12 +35177,12 @@ const getGitProjectName = async () => {
 
 const getGitCommitDetails = async () => {
   try {
-    const commitSha = process.env.GITHUB_SHA;
-    const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${commitSha}`;
+    const commitSha = getSecret('GITHUB_SHA');;
+    const apiUrl = `https://api.github.com/repos/${getSecret('GITHUB_REPOSITORY')}/commits/${commitSha}`;
     
     const response = await lib_axios.get(apiUrl, {
       headers: {
-        'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
+        'Authorization': `Bearer ${getSecret("REPO_TOKEN")}`,
       },
     });
 
@@ -35284,10 +35284,10 @@ const getGitCommitDetails = async () => {
 
 const getGitDiff = async () => {
   const repoToken = getSecret("REPO_TOKEN");
-  const commitHash = process.env.GITHUB_SHA;
+  const commitHash = getSecret('GITHUB_SHA');
 
   try {
-    const repoInfoUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}`;
+    const repoInfoUrl = `https://api.github.com/repos/${getSecret('GITHUB_REPOSITORY')}`;
     const repoInfoResponse = await lib_axios.get(repoInfoUrl, {
       headers: {
         Authorization: `Bearer ${repoToken}`,
@@ -35379,7 +35379,7 @@ const getContributorsPhotos = async () => {
   for (const contributor of contributors) {
     const response = await lib_axios.get(contributor.url, {
       headers: {
-        'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
+        'Authorization': `Bearer ${getSecret("REPO_TOKEN")}`,
       },
     });
 
@@ -35396,11 +35396,11 @@ const getContributorsPhotos = async () => {
 };
 
 const getContributorsList = async () => {
-  const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/contributors`;
+  const apiUrl = `https://api.github.com/repos/${getSecret('GITHUB_REPOSITORY')}/contributors`;
   
   const response = await lib_axios.get(apiUrl, {
     headers: {
-      'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
+      'Authorization': `Bearer ${getSecret("REPO_TOKEN")}`,
     },
   });
 
