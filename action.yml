@@ -21,7 +21,7 @@ inputs:
 
 runs:
   using: 'node16'
-  main: 'index.mjs'
+  main: 'node index.mjs'
 
 
 

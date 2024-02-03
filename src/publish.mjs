@@ -3,14 +3,14 @@ import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import OpenAI from "openai";
+// import OpenAI from "openai";
 import { exec } from "@actions/exec";
 
 dotenv.config();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
 
 const getGitPushNumber = async () => {
   let gitPushNumber;
@@ -56,82 +56,82 @@ const getGitProjectName = async () => {
   }
 };
 
-const getGitCommitDetails = async () => {
-  try {
-    const commitSha = process.env.GITHUB_SHA;
-    const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${commitSha}`;
+// const getGitCommitDetails = async () => {
+//   try {
+//     const commitSha = process.env.GITHUB_SHA;
+//     const apiUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/commits/${commitSha}`;
     
-    const response = await axios.get(apiUrl, {
-      headers: {
-        'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
-      },
-    });
+//     const response = await axios.get(apiUrl, {
+//       headers: {
+//         'Authorization': `Bearer ${process.env.REPO_TOKEN}`,
+//       },
+//     });
 
-    const commitDetails = {
-      number: response.data.sha.substring(0, 7),
-      author: response.data.commit.author.name,
-      link: response.data.html_url,
-    };
+//     const commitDetails = {
+//       number: response.data.sha.substring(0, 7),
+//       author: response.data.commit.author.name,
+//       link: response.data.html_url,
+//     };
 
-    console.log('Commit Details:', commitDetails);
+//     console.log('Commit Details:', commitDetails);
 
-    return commitDetails;
-  } catch (error) {
-    console.error('Error fetching commit details:', error.message);
-    return null;
-  }
-};
+//     return commitDetails;
+//   } catch (error) {
+//     console.error('Error fetching commit details:', error.message);
+//     return null;
+//   }
+// };
 
-const getGitDiffSummary = async () => {
-  const repoToken = process.env.REPO_TOKEN;
-  const commitHash = process.env.GITHUB_SHA;
+// const getGitDiffSummary = async () => {
+//   const repoToken = process.env.REPO_TOKEN;
+//   const commitHash = process.env.GITHUB_SHA;
 
-  try {
-    const repoInfoUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}`;
-    const repoInfoResponse = await axios.get(repoInfoUrl, {
-      headers: {
-        Authorization: `Bearer ${repoToken}`,
-      },
-    });
+//   try {
+//     const repoInfoUrl = `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}`;
+//     const repoInfoResponse = await axios.get(repoInfoUrl, {
+//       headers: {
+//         Authorization: `Bearer ${repoToken}`,
+//       },
+//     });
 
-    const owner = repoInfoResponse.data.owner.login;
-    const repo = repoInfoResponse.data.name;
+//     const owner = repoInfoResponse.data.owner.login;
+//     const repo = repoInfoResponse.data.name;
 
-    const commitDiffUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${commitHash}`;
-    const commitDiffResponse = await axios.get(commitDiffUrl, {
-      headers: {
-        Authorization: `Bearer ${repoToken}`,
-      },
-    });
+//     const commitDiffUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${commitHash}`;
+//     const commitDiffResponse = await axios.get(commitDiffUrl, {
+//       headers: {
+//         Authorization: `Bearer ${repoToken}`,
+//       },
+//     });
 
-    const patchContent = commitDiffResponse.data.files.map(file => file.patch).join('\n\n');
+//     const patchContent = commitDiffResponse.data.files.map(file => file.patch).join('\n\n');
 
-    const diffLines = patchContent.split('\n');
+//     const diffLines = patchContent.split('\n');
 
-    const prompt = diffLines.slice(0, 5).join('\n');
+//     const prompt = diffLines.slice(0, 5).join('\n');
 
-    const messages = [
-      { role: 'user', content: `Summarize the following Git diff:\n${prompt}` },
-    ];
+//     const messages = [
+//       { role: 'user', content: `Summarize the following Git diff:\n${prompt}` },
+//     ];
 
-    const response = await openai.chat.completions.create({
-      messages,
-      model: 'gpt-3.5-turbo',
-    });
+//     const response = await openai.chat.completions.create({
+//       messages,
+//       model: 'gpt-3.5-turbo',
+//     });
 
-    if (response && response.choices && response.choices.length > 0) {
-      const summary = response.choices[0].message.content.trim();
-      console.log('Summary:', summary);
-      return summary;
-    } else {
-      console.error('Error retrieving summary from ChatGPT.');
-      return null;
-    }
-  } catch (error) {
-    console.error('Error getting Git diff summary:', error.message);
-    return null;
-  }
-};
+//     if (response && response.choices && response.choices.length > 0) {
+//       const summary = response.choices[0].message.content.trim();
+//       console.log('Summary:', summary);
+//       return summary;
+//     } else {
+//       console.error('Error retrieving summary from ChatGPT.');
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error('Error getting Git diff summary:', error.message);
+//     return null;
+//   }
+// };
 
 // const getGitDiffFile = async () => {
 //   const repoToken = process.env.REPO_TOKEN;
@@ -228,7 +228,7 @@ const generateBlogContent = async () => {
   try {
     const gitPushNumber = await getGitPushNumber();
     const commitDetails = await getGitCommitDetails();
-    const changesSummary = await getGitDiffSummary();
+    // const changesSummary = await getGitDiffSummary();
     const codeChanges = await getGitDiff();
     
     const contributorsPhotos = await getContributorsPhotos();
