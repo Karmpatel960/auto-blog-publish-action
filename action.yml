@@ -6,16 +6,16 @@ branding:
   color: 'green'
 
 inputs:
-  hashnode-api-key:
+  HASHNODE_API_KEY:
     description: 'API key for Hashnode'
     required: true
-  hashnode-blog-id:
+  HASHNODE_BLOG_ID:
     description: 'Blog ID for Hashnode'
     required: true
-  repo-token:
+  REPO_TOKEN:
     description: 'GitHub repository token'
     required: true
-  openai-api-key:
+  OPENAI_API_KEY:
     description: 'API key for OpenAI'
     required: true
 
