@@ -1,6 +1,6 @@
 name: 'Publish Action'
 description: 'An action to publish a blog post'
-author: 'Karm patel'
+author: 'Karm Patel'
 branding:
   icon: 'upload-cloud'
   color: 'green'
@@ -23,7 +23,28 @@ outputs:
   publish-output:
     description: 'Output for publish blog'
 
-runs:
-  using: 'node16'
-  main: 'index.mjs'
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Publish Action
+        run: node index.mjs
+        env:
+          HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
+          HASHNODE_BLOG_ID: ${{ secrets.HASHNODE_BLOG_ID }}
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
 

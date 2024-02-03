@@ -1,6 +1,6 @@
 {
   "name": "auto-blog-publish-action",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "It will publish automatically to your hashnode and it will generate blog for it",
   "main": "index.mjs",
   "scripts": {
