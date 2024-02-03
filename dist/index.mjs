@@ -35177,7 +35177,7 @@ const getGitProjectName = async () => {
 
 const getGitCommitDetails = async () => {
   try {
-    const commitSha = getSecret('GITHUB_SHA');;
+    const commitSha = process.env.GITHUB_SHA;
     const apiUrl = `https://api.github.com/repos/${getSecret('GITHUB_REPOSITORY')}/commits/${commitSha}`;
     
     const response = await lib_axios.get(apiUrl, {
@@ -35284,7 +35284,7 @@ const getGitCommitDetails = async () => {
 
 const getGitDiff = async () => {
   const repoToken = getSecret("REPO_TOKEN");
-  const commitHash = getSecret('GITHUB_SHA');
+  const commitHash = process.env.GITHUB_SHA;
 
   try {
     const repoInfoUrl = `https://api.github.com/repos/${getSecret('GITHUB_REPOSITORY')}`;
