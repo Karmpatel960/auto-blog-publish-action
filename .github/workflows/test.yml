@@ -22,7 +22,7 @@ jobs:
 
       - name: Run Custom Action
         id: auto-blog-publish-action
-        uses: ./ # Assuming the action is in the root directory
+        uses: ./
         with:
           HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
           HASHNODE_BLOG_ID: ${{ secrets.HASHNODE_BLOG_ID }}
